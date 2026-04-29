@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyFatoorah · Dual Lead Hunter v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#080b10; --card:#111820; --card2:#141c26;
+  --border:rgba(255,255,255,0.06); --border2:rgba(255,255,255,0.11);
+  --text:#e8edf5; --muted:#58677a; --muted2:#8a9bb0;
+  --green:#00c896; --green2:#00ffb3;
+  --amber:#f0a500; --red:#ff4757; --blue:#3d8bff;
+  --hot:#ff6b35; --warm:#f0a500;
+  --pos:#00c896; --pay:#7c6aff;
+  --mono:'DM Mono',monospace;
+  --sans:'Instrument Sans',sans-serif;
+  --disp:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;min-height:100vh;}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,200,150,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,150,.018) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;}
+.wrap{position:relative;z-index:1;max-width:1500px;margin:0 auto;}
+
+.hdr{position:sticky;top:0;z-index:200;background:rgba(8,11,16,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border2);padding:0 24px;height:62px;display:flex;align-items:center;gap:14px;}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-weight:800;font-size:16px;}
+.logo-mark{width:32px;height:32px;background:linear-gradient(135deg,var(--green),#00a3ff);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.logo span{color:var(--green);}
+.badge{padding:4px 11px;border-radius:100px;background:rgba(0,200,150,.08);border:1px solid rgba(0,200,150,.2);font-family:var(--mono);font-size:11px;font-weight:600;color:var(--green);}
+.hgap{flex:1;}
+.hchip{font-family:var(--mono);font-size:11px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px 12px;display:flex;flex-direction:column;align-items:center;line-height:1.2;}
+.hchip .v{font-size:15px;font-weight:600;color:var(--green);}
+.hchip .l{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+.hchip.hot .v{color:var(--hot);}
+.hchip.pay .v{color:var(--pay);}
+
+.mode-tabs{display:flex;gap:0;background:var(--card);border:1px solid var(--border2);border-radius:11px;padding:4px;margin:20px 24px 0;}
+.mtab{flex:1;padding:12px 20px;border-radius:8px;border:none;font-family:var(--disp);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;background:transparent;color:var(--muted2);display:flex;align-items:center;justify-content:center;gap:10px;flex-direction:column;}
+.mtab > .row1{display:flex;align-items:center;gap:8px;}
+.mtab > .row2{font-family:var(--mono);font-size:10px;opacity:.7;font-weight:400;}
+.mtab.pos.active{background:rgba(0,200,150,.12);color:var(--pos);box-shadow:inset 0 0 0 1px rgba(0,200,150,.25);}
+.mtab.pay.active{background:rgba(124,106,255,.12);color:var(--pay);box-shadow:inset 0 0 0 1px rgba(124,106,255,.25);}
+.mtab:not(.active):hover{background:rgba(255,255,255,.03);}
+.mtab-pip{width:8px;height:8px;border-radius:50%;}
+.mtab.pos .mtab-pip{background:var(--pos);}
+.mtab.pay .mtab-pip{background:var(--pay);}
+
+.main{padding:16px 24px;display:flex;flex-direction:column;gap:14px;}
+.scard{background:var(--card);border:1px solid var(--border2);border-radius:14px;padding:20px;}
+.stag{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.stag.pos{color:var(--pos);}.stag.pay{color:var(--pay);}
+.stag::before{content:'';width:3px;height:3px;border-radius:50%;background:currentColor;box-shadow:0 0 5px currentColor;}
+.srow{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.sinput{flex:1;min-width:200px;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:9px;padding:11px 16px;color:var(--text);font-family:var(--sans);font-size:14px;outline:none;transition:border-color .2s;}
+.sinput.pos:focus{border-color:var(--pos);}.sinput.pay:focus{border-color:var(--pay);}
+.sinput::placeholder{color:var(--muted);}
+.hbtn{border:none;font-family:var(--disp);font-size:13px;font-weight:700;border-radius:9px;padding:11px 24px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px;white-space:nowrap;}
+.hbtn.pos{background:var(--pos);color:#080b10;}.hbtn.pos:hover{background:var(--green2);}
+.hbtn.pay{background:var(--pay);color:#fff;}.hbtn.pay:hover{filter:brightness(1.15);}
+.hbtn:disabled{opacity:.4;cursor:not-allowed;}
+.cats{display:flex;gap:7px;flex-wrap:wrap;}
+.cat{padding:5px 12px;border-radius:100px;border:1px solid var(--border2);background:rgba(255,255,255,.03);color:var(--muted2);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;}
+.cat:hover{background:rgba(255,255,255,.06);color:var(--text);}
+.cat.pos:hover{border-color:var(--pos);color:var(--pos);}.cat.pay:hover{border-color:var(--pay);color:var(--pay);}
+.cat.auto{font-weight:700;}
+.cat.auto.pos{border-color:rgba(0,200,150,.35);color:var(--pos);}.cat.auto.pay{border-color:rgba(124,106,255,.35);color:var(--pay);}
+
+.status{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:9px 14px;min-height:44px;}
+.smsg{flex:1;font-family:var(--mono);font-size:12px;color:var(--muted2);}
+.smsg.scan.pos{color:var(--pos);}.smsg.scan.pay{color:var(--pay);}
+.smsg.done{color:var(--green);}.smsg.err{color:var(--red);}
+.spin{width:13px;height:13px;border-radius:50%;border:2px solid rgba(255,255,255,.15);border-top-color:currentColor;animation:spin .8s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.statsrow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+.sbox{background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:14px 16px;}
+.sbox-v{font-family:var(--disp);font-size:26px;font-weight:800;line-height:1;}
+.sbox-l{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;}
+.sbox.hot .sbox-v{color:var(--hot);}.sbox.warm .sbox-v{color:var(--warm);}
+.sbox.total .sbox-v{color:var(--text);}.sbox.done .sbox-v{color:var(--green);}
+.sbox.err .sbox-v{color:var(--red);}
+
+.crow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}.gg{flex:1;}
+.cbtn{background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:7px 14px;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.5px;cursor:pointer;transition:all .15s;color:var(--muted2);}
+.cbtn.pos-exp{color:var(--pos);border-color:rgba(0,200,150,.25);background:rgba(0,200,150,.05);}
+.cbtn.pos-exp:hover{background:rgba(0,200,150,.12);}
+.cbtn.pay-exp{color:var(--pay);border-color:rgba(124,106,255,.25);background:rgba(124,106,255,.05);}
+.cbtn.pay-exp:hover{background:rgba(124,106,255,.12);}
+.cbtn.clr:hover{color:var(--red);border-color:rgba(255,71,87,.3);}
+
+.tbl-wrap{background:var(--card);border:1px solid var(--border2);border-radius:14px;overflow:hidden;}
+.tbl-head{display:grid;gap:0;padding:10px 16px;background:var(--card2);border-bottom:1px solid var(--border2);font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);}
+.tbl-head.pos-head{grid-template-columns:2fr 1fr 1.3fr 0.8fr 1.1fr 0.9fr 0.9fr;}
+.tbl-head.pay-head{grid-template-columns:2fr 1fr 1.3fr 0.8fr 0.9fr 0.9fr 0.9fr;}
+.tbl-body{max-height:580px;overflow-y:auto;}
+.row{display:grid;gap:0;padding:12px 16px;border-bottom:1px solid var(--border);transition:background .15s;align-items:center;animation:fi .3s ease both;}
+.row.pos-row{grid-template-columns:2fr 1fr 1.3fr 0.8fr 1.1fr 0.9fr 0.9fr;}
+.row.pay-row{grid-template-columns:2fr 1fr 1.3fr 0.8fr 0.9fr 0.9fr 0.9fr;}
+@keyframes fi{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
+.row:hover{background:rgba(255,255,255,.02);}
+.row.hot{border-left:2px solid var(--hot);}
+.row.warm{border-left:2px solid var(--warm);}
+.row.cold{border-left:2px solid var(--border2);}
+.rname{font-weight:600;font-size:13px;word-break:break-word;}
+.rmono{font-family:var(--mono);font-size:11px;color:var(--muted);}
+.rphone{font-family:var(--mono);font-size:12px;color:var(--green2);}
+.rsite a{color:var(--blue);font-family:var(--mono);font-size:11px;text-decoration:none;word-break:break-all;}
+.rsite a:hover{color:var(--green);text-decoration:underline;}
+.rpill{font-family:var(--mono);font-size:9px;font-weight:700;padding:3px 8px;border-radius:100px;white-space:nowrap;display:inline-block;}
+.rpill.hot{background:rgba(255,107,53,.12);color:var(--hot);border:1px solid rgba(255,107,53,.25);}
+.rpill.warm{background:rgba(240,165,0,.1);color:var(--warm);border:1px solid rgba(240,165,0,.2);}
+.rpill.cold{background:rgba(88,103,122,.1);color:var(--muted);border:1px solid var(--border);}
+.rstatus{font-family:var(--mono);font-size:10px;}
+.rstatus.ok{color:var(--green);}.rstatus.q{color:var(--amber);}.rstatus.e{color:var(--red);}
+.empty{padding:52px 24px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:13px;}
+.empty div{font-size:32px;margin-bottom:14px;}
+.tbl-body::-webkit-scrollbar{width:4px;}
+.tbl-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+.score-bar{height:3px;border-radius:2px;background:rgba(255,255,255,.06);margin-top:3px;}
+.score-fill{height:100%;border-radius:2px;transition:width .5s;}
+.reason{font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:2px;}
+.rating-stars{color:var(--amber);font-size:11px;}
+.rating-num{font-family:var(--mono);font-size:11px;color:var(--muted2);}
+
+@media(max-width:900px){
+  .statsrow{grid-template-columns:repeat(2,1fr);}
+  .tbl-head,.row{grid-template-columns:2fr 1fr 1fr 0.8fr !important;}
+  .rmono,.rsite,.reason{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hdr">
+  <div class="logo">
+    <div class="logo-mark">⚡</div>
+    My<span>Fatoorah</span> Lead Hunter
+  </div>
+  <div class="badge">v2 · DUAL MODE · RAILWAY</div>
+  <div class="hgap"></div>
+  <div style="display:flex;gap:8px;">
+    <div class="hchip"><span class="v" id="sTotalPOS">0</span><span class="l">POS</span></div>
+    <div class="hchip hot"><span class="v" id="sHotPOS">0</span><span class="l">POS HOT</span></div>
+    <div class="hchip pay"><span class="v" id="sTotalPAY">0</span><span class="l">PAYLINK</span></div>
+    <div class="hchip hot"><span class="v" id="sHotPAY">0</span><span class="l">PAY HOT</span></div>
+  </div>
+</header>
+
+<div class="mode-tabs">
+  <button class="mtab pos active" id="tabPOS" onclick="switchMode('POS')">
+    <div class="row1"><div class="mtab-pip"></div>🖥️ POS TERMINAL HUNTER</div>
+    <div class="row2">Physical merchants · ~100K AED/mo target</div>
+  </button>
+  <button class="mtab pay" id="tabPAY" onclick="switchMode('PAYLINK')">
+    <div class="row1"><div class="mtab-pip"></div>🔗 PAYMENT LINKS HUNTER</div>
+    <div class="row2">Online businesses · No gateway detected</div>
+  </button>
+</div>
+
+<main class="main">
+
+<div class="scard">
+  <div class="stag pos" id="modeTag">⚡ POS MERCHANT DISCOVERY · Google Maps Source</div>
+  <div class="srow">
+    <input class="sinput pos" id="kw" type="text"
+      placeholder="Type sector or leave blank for random...">
+    <button class="hbtn pos" id="hbtn" onclick="hunt()">🎯 HUNT LEADS</button>
+  </div>
+  <div class="cats" id="catList"></div>
+</div>
+
+<div class="status">
+  <div class="smsg" id="statusMsg">Ready — select mode and HUNT.</div>
+  <div class="spin" id="spin" style="display:none;color:var(--green);"></div>
+</div>
+
+<div class="statsrow">
+  <div class="sbox total"><div class="sbox-v" id="stTotal">0</div><div class="sbox-l">Total</div></div>
+  <div class="sbox done"><div class="sbox-v" id="stDone">0</div><div class="sbox-l">Enriched</div></div>
+  <div class="sbox hot"><div class="sbox-v" id="stHot">0</div><div class="sbox-l">🔥 HOT</div></div>
+  <div class="sbox warm"><div class="sbox-v" id="stWarm">0</div><div class="sbox-l">🌡 WARM</div></div>
+  <div class="sbox err"><div class="sbox-v" id="stErr">0</div><div class="sbox-l">⚠ Errors</div></div>
+</div>
+
+<div class="crow">
+  <div style="font-family:var(--mono);font-size:11px;color:var(--muted)" id="ctrlInfo">0 leads</div>
+  <div class="gg"></div>
+  <button class="cbtn pos-exp" id="expBtn" onclick="exportCSV()">⬇ EXPORT CSV</button>
+  <button class="cbtn clr" onclick="clearMode()">✕ CLEAR MODE</button>
+</div>
+
+<div class="tbl-wrap">
+  <div class="tbl-head pos-head" id="tblHead">
+    <span>BUSINESS</span><span>RATING</span><span>PHONE</span><span>WEBSITE</span><span>REV EST</span><span>PRIORITY</span><span>STATUS</span>
+  </div>
+  <div class="tbl-body" id="tblBody">
+    <div class="empty"><div>🎯</div>Choose a mode and HUNT to begin</div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+let mode = 'POS';
+let polling = null;
+
+const POS_CATS = ['⚡ RANDOM','restaurant','cafe','salon','barbershop','clinic','pharmacy','supermarket','gym','spa','jewelry store','electronics store','bakery','auto service'];
+const PAY_CATS = ['⚡ RANDOM','online store dubai','consulting agency dubai','photography studio dubai','event management dubai','digital marketing agency dubai','catering company dubai','interior design dubai','travel agency dubai','IT services dubai'];
+
+function switchMode(m) {
+  mode = m;
+  document.getElementById('tabPOS').classList.toggle('active', m === 'POS');
+  document.getElementById('tabPAY').classList.toggle('active', m === 'PAYLINK');
+
+  const isPOS = m === 'POS';
+  const kw = document.getElementById('kw');
+  kw.className = 'sinput ' + (isPOS ? 'pos' : 'pay');
+  kw.placeholder = isPOS
+    ? 'Type sector (restaurant, clinic, salon...) or blank for random'
+    : 'Type sector (online store, consulting...) or blank for random';
+
+  const btn = document.getElementById('hbtn');
+  btn.className = 'hbtn ' + (isPOS ? 'pos' : 'pay');
+  btn.textContent = isPOS ? '🎯 HUNT POS LEADS' : '🔗 HUNT PAYLINK LEADS';
+
+  const tag = document.getElementById('modeTag');
+  tag.className = 'stag ' + (isPOS ? 'pos' : 'pay');
+  tag.textContent = isPOS
+    ? '⚡ POS MERCHANT DISCOVERY · Physical Businesses · Google Maps Source'
+    : '🔗 PAYMENT LINKS DISCOVERY · Online Merchants · Gateway Check Active';
+
+  document.getElementById('expBtn').className = 'cbtn ' + (isPOS ? 'pos-exp' : 'pay-exp');
+
+  const head = document.getElementById('tblHead');
+  head.className = 'tbl-head ' + (isPOS ? 'pos-head' : 'pay-head');
+  if (isPOS) {
+    head.innerHTML = '<span>BUSINESS</span><span>RATING</span><span>PHONE</span><span>WEBSITE</span><span>REV EST</span><span>PRIORITY</span><span>STATUS</span>';
+  } else {
+    head.innerHTML = '<span>BUSINESS</span><span>RATING</span><span>PHONE</span><span>WEBSITE</span><span>GATEWAY</span><span>PRIORITY</span><span>STATUS</span>';
+  }
+
+  buildCats();
+  loadLeads();
+}
+
+function buildCats() {
+  const list = document.getElementById('catList');
+  const cats = mode === 'POS' ? POS_CATS : PAY_CATS;
+  const cls = mode === 'POS' ? 'pos' : 'pay';
+  list.innerHTML = cats.map((c,i) =>
+    `<span class="cat ${cls} ${i===0?'auto':''}" onclick="pickCat('${c}')">${c}</span>`
+  ).join('');
+}
+
+function pickCat(c) {
+  document.getElementById('kw').value = c === '⚡ RANDOM' ? '' : c;
+  hunt();
+}
+
+async function hunt() {
+  const kw  = document.getElementById('kw').value.trim();
+  const btn = document.getElementById('hbtn');
+  const msg = document.getElementById('statusMsg');
+  const sp  = document.getElementById('spin');
+
+  btn.disabled = true;
+  sp.style.display = 'block';
+  sp.style.color = mode === 'POS' ? 'var(--pos)' : 'var(--pay)';
+  msg.className = `smsg scan ${mode === 'POS' ? 'pos' : 'pay'}`;
+  msg.textContent = kw ? `Scanning Google Maps for "${kw}" [${mode}]…` : `Picking random category [${mode}]…`;
+
+  try {
+    const res = await fetch('/api/search', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ mode, keyword: kw }),
+    });
+    const d = await res.json();
+    msg.textContent = `${d.message} — enriching contacts in background…`;
+    if (polling) clearInterval(polling);
+    polling = setInterval(loadLeads, 4000);
+    setTimeout(loadLeads, 1200);
+  } catch(e) {
+    msg.className = 'smsg err';
+    msg.textContent = 'Server connection error.';
+  } finally {
+    btn.disabled = false;
+    sp.style.display = 'none';
+  }
+}
+
+async function loadLeads() {
+  try {
+    const [leads, stats, statsOther] = await Promise.all([
+      fetch(`/api/leads?mode=${mode}`).then(r=>r.json()),
+      fetch(`/api/stats?mode=${mode}`).then(r=>r.json()),
+      fetch(`/api/stats?mode=${mode==='POS'?'PAYLINK':'POS'}`).then(r=>r.json()),
+    ]);
+
+    document.getElementById('sTotalPOS').textContent = mode === 'POS' ? (stats.total||0) : (statsOther.total||0);
+    document.getElementById('sHotPOS').textContent   = mode === 'POS' ? (stats.hot||0)   : (statsOther.hot||0);
+    document.getElementById('sTotalPAY').textContent = mode === 'POS' ? (statsOther.total||0) : (stats.total||0);
+    document.getElementById('sHotPAY').textContent   = mode === 'POS' ? (statsOther.hot||0)   : (stats.hot||0);
+
+    document.getElementById('stTotal').textContent = stats.total  || 0;
+    document.getElementById('stDone').textContent  = stats.complete || 0;
+    document.getElementById('stHot').textContent   = stats.hot   || 0;
+    document.getElementById('stWarm').textContent  = stats.warm  || 0;
+    document.getElementById('stErr').textContent   = stats.errors || 0;
+    document.getElementById('ctrlInfo').textContent = `${leads.length} leads · ${stats.queued||0} in queue`;
+
+    const body = document.getElementById('tblBody');
+    if (!leads.length) {
+      body.innerHTML = `<div class="empty"><div>🔍</div>No leads in ${mode} mode yet — scanning…</div>`;
+      return;
+    }
+
+    const isPOS = mode === 'POS';
+    body.innerHTML = leads.map((l,i) => {
+      const pc = l.priority === 'HOT' ? 'hot' : l.priority === 'WARM' ? 'warm' : 'cold';
+      const sc = l.status === 'COMPLETE' ? 'ok' : l.status === 'ERROR' ? 'e' : 'q';
+      const scoreW = Math.min(100, l.fit_score || 0);
+      const scoreColor = l.priority === 'HOT' ? 'var(--hot)' : l.priority === 'WARM' ? 'var(--warm)' : 'var(--muted)';
+
+      const phone = l.phone && l.phone !== 'Not Found' ? esc(l.phone) : '<span style="color:var(--muted)">—</span>';
+      const site  = l.website && l.website !== 'Not Found'
+        ? `<a href="${esc(l.website)}" target="_blank" rel="noopener">${trunc(l.website,24)}</a>`
+        : '<span style="color:var(--muted)">—</span>';
+
+      const ratingHtml = l.rating > 0
+        ? `<span class="rating-num">${l.rating}★ <span style="color:var(--muted)">(${l.review_count||0})</span></span>`
+        : `<span style="color:var(--muted)">—</span>`;
+
+      const col5 = isPOS
+        ? `<div style="font-family:var(--mono);font-size:11px;color:${l.priority==='HOT'?'var(--hot)':'var(--amber)'}">${esc(l.revenue_est||'—')}</div>`
+        : `<div style="font-family:var(--mono);font-size:11px;color:${l.has_gateway?'var(--muted)':'var(--green)'}">${l.has_gateway?'Has gateway':'None ✓'}</div>`;
+
+      return `
+        <div class="row ${isPOS?'pos-row':'pay-row'} ${pc}" style="animation-delay:${Math.min(i*.04,1)}s">
+          <div>
+            <div class="rname">${esc(l.name)}</div>
+            <div class="reason">${esc(l.reason||'')}</div>
+          </div>
+          <div>${ratingHtml}</div>
+          <div class="rphone">${phone}</div>
+          <div class="rsite">${site}</div>
+          ${col5}
+          <div>
+            <span class="rpill ${pc}">${l.priority||'PENDING'}</span>
+            <div class="score-bar"><div class="score-fill" style="width:${scoreW}%;background:${scoreColor}"></div></div>
+          </div>
+          <div class="rstatus ${sc}">${l.status}</div>
+        </div>`;
+    }).join('');
+
+    if ((stats.queued||0) === 0 && (stats.complete||0) > 0) {
+      const msg = document.getElementById('statusMsg');
+      if (msg.className.includes('scan')) {
+        msg.className = 'smsg done';
+        msg.textContent = `✓ Done — ${stats.complete} enriched · ${stats.hot} HOT · ${stats.warm} WARM`;
+      }
+    }
+  } catch(e) { console.error(e); }
+}
+
+function exportCSV() {
+  window.open(`/api/export?mode=${mode}`, '_blank');
+}
+
+async function clearMode() {
+  if (!confirm(`Clear all ${mode} leads?`)) return;
+  await fetch(`/api/leads?mode=${mode}`, { method:'DELETE' });
+  document.getElementById('tblBody').innerHTML = `<div class="empty"><div>🗑</div>${mode} cleared</div>`;
+  ['stTotal','stDone','stHot','stWarm','stErr'].forEach(id => document.getElementById(id).textContent='0');
+  document.getElementById('statusMsg').className = 'smsg';
+  document.getElementById('statusMsg').textContent = 'Ready.';
+  if (polling) { clearInterval(polling); polling = null; }
+}
+
+function trunc(s,n){return s&&s.length>n?s.substring(0,n)+'…':s;}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+buildCats();
+loadLeads();
+setInterval(loadLeads, 8000);
+</script>
+</body>
+</html>
